@@ -1,0 +1,203 @@
+# Backend Specification - .NET C# Integration
+
+## Overview
+This document outlines the entities, API endpoints, and business logic required to migrate the current Bookio frontend (Next.js) to a robust .NET C# backend.
+
+## 1. Data Entities (C# Models)
+
+### Core Identity & Users
+```csharp
+public class User
+{
+    public Guid Id { get; set; }
+    public string Email { get; set; }
+    public string PasswordHash { get; set; } // ASP.NET Identity
+    public string FirstName { get; set; } // "Namn" split?
+    public string LastName { get; set; }
+    public string Phone { get; set; }
+    public DateTime? DateOfBirth { get; set; }
+    public UserRole Role { get; set; } // User, BusinessAdmin, SuperAdmin
+    public DateTime CreatedAt { get; set; }
+}
+
+public enum UserRole
+{
+    User,
+    BusinessOwner,
+    SuperAdmin
+}
+```
+
+### Business Domain
+```csharp
+public class Business
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public string Slug { get; set; } // For SEO-friendly URLs
+    public string Description { get; set; }
+    public string Address { get; set; }
+    public string City { get; set; }
+    public string Category { get; set; } // Could be an Enum or separate Entity
+    public double Rating { get; set; } // Aggregated from reviews
+    public string ImageUrl { get; set; }
+    
+    // Relationships
+    public Guid OwnerId { get; set; }
+    public User Owner { get; set; }
+    public ICollection<Service> Services { get; set; }
+    public ICollection<Staff> Staff { get; set; }
+    public ICollection<Review> Reviews { get; set; }
+}
+
+public class BusinessSettings 
+{
+    public Guid BusinessId { get; set; }
+    public string Currency { get; set; } = "SEK";
+    public string TimeZone { get; set; } = "Europe/Stockholm";
+    // Booking rules, cancellation policies etc.
+}
+```
+
+### Service & Resources
+```csharp
+public class Service
+{
+    public Guid Id { get; set; }
+    public Guid BusinessId { get; set; }
+    public string Name { get; set; } // e.g., "Herrklippning"
+    public string Description { get; set; }
+    public int DurationMinutes { get; set; }
+    public decimal Price { get; set; }
+    public bool IsActive { get; set; }
+}
+
+public class Staff
+{
+    public Guid Id { get; set; }
+    public Guid BusinessId { get; set; }
+    public string Name { get; set; }
+    public string Title { get; set; } // e.g., "Frisör", "Terapeut"
+    public string ImageUrl { get; set; }
+    public string Bio { get; set; }
+    public bool IsActive { get; set; }
+    
+    // Which services can this staff perform?
+    public ICollection<Service> QualifiedServices { get; set; }
+}
+
+public class Schedule // Working hours
+{
+    public Guid Id { get; set; }
+    public Guid StaffId { get; set; } // Or BusinessId if generic
+    public DayOfWeek DayOfWeek { get; set; }
+    public TimeSpan StartTime { get; set; }
+    public TimeSpan EndTime { get; set; }
+    public bool IsDayOff { get; set; }
+}
+```
+
+### Booking Domain
+```csharp
+public class Booking
+{
+    public Guid Id { get; set; }
+    public string BookingReference { get; set; } // Friendly ID e.g., "BK-12345"
+    
+    public Guid BusinessId { get; set; }
+    public Guid ServiceId { get; set; }
+    public Guid? StaffId { get; set; } // Optional if "Any staff" selected
+    
+    // Customer Info (Linked to User if logged in, otherwise guest details)
+    public Guid? CustomerId { get; set; }
+    public string CustomerName { get; set; }
+    public string CustomerEmail { get; set; }
+    public string CustomerPhone { get; set; }
+    
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; } // Calculated from Duration
+    
+    public BookingStatus Status { get; set; }
+    
+    public DateTime CreatedAt { get; set; }
+}
+
+public enum BookingStatus
+{
+    Pending,
+    Confirmed,
+    Cancelled,
+    Completed,
+    NoShow
+}
+
+public class Review
+{
+    public Guid Id { get; set; }
+    public Guid BusinessId { get; set; }
+    public Guid UserId { get; set; }
+    public int Rating { get; set; } // 1-5
+    public string Comment { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
+```
+
+## 2. API Endpoints
+
+### Authentication (Identity)
+- `POST /api/auth/register` - Create new user account
+- `POST /api/auth/login` - Authenticate and get Token (JWT)
+- `POST /api/auth/refresh-token`
+- `POST /api/auth/forgot-password`
+- `GET /api/auth/me` - Get current user profile
+
+### Business (Public)
+- `GET /api/businesses` - Search/List businesses (filters: city, category, query)
+- `GET /api/businesses/{slug}` - Get details for a specific business
+- `GET /api/businesses/{slug}/services` - List services for business
+- `GET /api/businesses/{slug}/reviews` - List reviews
+
+### Booking (Public/User)
+- `GET /api/businesses/{id}/availability?date=...&serviceId=...` - Get available slots
+  - **Logic**: Check Staff schedules, subtract existing bookings, ensure Service duration fits.
+- `POST /api/bookings` - Create a new booking
+  - **Logic**: Validate availability again (race condition check), send confirmation email.
+- `GET /api/user/bookings` - List my bookings
+- `POST /api/bookings/{id}/cancel` - Cancel booking (check cancellation policy)
+
+### Business Administration (Protected - Owner/Admin)
+- `GET /api/admin/dashboard/stats` - Stats (Revenue, bookings, activity)
+- `GET /api/admin/bookings` - List all bookings for business
+- `PUT /api/admin/bookings/{id}/status` - Update status (e.g. mark as NoShow)
+- `POST /api/admin/services` - Create service
+- `PUT /api/admin/services/{id}` - Update service
+- `POST /api/admin/staff` - Add staff member
+- `PUT /api/admin/staff/{id}/schedule` - Update working hours
+- `GET /api/admin/settings` - Get business settings
+
+### Application Administration (Super Admin)
+- `GET /api/superadmin/businesses` - List all businesses
+- `PUT /api/superadmin/businesses/{id}/status` - Approve/Suspend business
+
+## 3. Important Logic & Considerations
+
+1.  **Availability Calculation**:
+    *   This is the most complex logic.
+    *   Must intersect **Staff Working Hours** with **Service Duration**.
+    *   Must subtract **Existing Bookings**.
+    *   *Edge Case*: "Any Staff" selection needs to aggregate all qualified staff availability.
+
+2.  **Time Zones**:
+    *   backend should store everything in UTC.
+    *   APIs should separate "Slot Time" (Utc) from "Business Local Time" context if needed, but standardizing on returning ISO8601 strings is best.
+
+3.  **Concurrency**:
+    *   Two users booking the same slot at the same time. Use database transactions or optimistic concurrency checks (`RowVersion`) when creating a booking.
+
+4.  **Guest vs Registered Bookings**:
+    *   Allow creating bookings without a `UserId`, but capture `CustomerEmail` and `CustomerPhone`.
+    *   Verify email format strictly.
+
+5.  **Notifications**:
+    *   Trigger Email/SMS on `BookingCreated`, `BookingCancelled`, `BookingReminder`.
+    *   Use a background job (e.g., Hangfire) for Reminders.
