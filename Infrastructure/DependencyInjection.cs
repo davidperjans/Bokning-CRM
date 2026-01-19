@@ -1,4 +1,7 @@
-﻿using Infrastructure.Database;
+﻿using Application.Interface;
+using Infrastructure.Authentication;
+using Infrastructure.Database;
+using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,26 +12,20 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
-            // Database
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            // Repositories
+            services.AddScoped<IUserRepository, UserRepository>();
+            
+            services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
+            // Database configuration
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<AppDbContext>(options =>
             {
-                // Skip configuration if no connection string (allows EF tools to work)
                 if (!string.IsNullOrEmpty(connectionString))
                 {
-                    options.UseNpgsql(connectionString, npgsqlOptions =>
-                    {
-                        npgsqlOptions.EnableRetryOnFailure(
-                            maxRetryCount: 3,
-                            maxRetryDelay: TimeSpan.FromSeconds(5),
-                            errorCodesToAdd: null);
-
-                        npgsqlOptions.CommandTimeout(30);
-                    });
+                    options.UseNpgsql(connectionString);
                 }
             });
-
 
             return services;
         }
