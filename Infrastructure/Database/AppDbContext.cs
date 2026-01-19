@@ -13,6 +13,11 @@ namespace Infrastructure.Database
         public DbSet<User> Users { get; set; }
         public DbSet<Business> Businesses { get; set; }
         public DbSet<BusinessSettings> BusinessSettings { get; set; }
+        public DbSet<BookingType> BookingTypes { get; set; }
+        public DbSet<Resource> Resources { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
+        public DbSet<BookingTypeResource> BookingTypeResources { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
