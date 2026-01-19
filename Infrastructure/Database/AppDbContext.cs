@@ -1,5 +1,6 @@
 ﻿using Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace Infrastructure.Database
 {
@@ -9,40 +10,13 @@ namespace Infrastructure.Database
         {
         }
 
-        // Define DbSets for your entities here
         public DbSet<User> Users { get; set; }
+        public DbSet<Business> Businesses { get; set; }
+        public DbSet<BusinessSettings> BusinessSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id)
-                    .HasDefaultValueSql("gen_random_uuid()");
-
-                entity.HasIndex(e => e.Email).IsUnique();
-
-                entity.Property(e => e.Email)
-                    .IsRequired()
-                    .HasMaxLength(255);
-
-                entity.Property(e => e.PasswordHash).IsRequired();
-                entity.Property(e => e.FirstName).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.LastName).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.Phone).HasMaxLength(20);
-
-                entity.Property(e => e.Role)
-                    .IsRequired()
-                    .HasConversion<string>()
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.CreatedAt).IsRequired()
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                entity.Property(e => e.DateOfBirth).IsRequired(false);
-            });
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
     }
 }
