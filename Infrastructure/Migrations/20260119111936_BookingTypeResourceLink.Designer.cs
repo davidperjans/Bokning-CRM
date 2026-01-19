@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260119111936_BookingTypeResourceLink")]
+    partial class BookingTypeResourceLink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,15 +72,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookingTypeId");
-
-                    b.HasIndex("ResourceId");
-
-                    b.HasIndex("BusinessId", "UserId", "Status");
-
-                    b.HasIndex("BusinessId", "ResourceId", "StartTimeUtc", "EndTimeUtc");
-
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("Domain.Models.BookingType", b =>
@@ -115,8 +110,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("RequiresApproval")
                         .HasColumnType("boolean");
@@ -126,11 +120,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BusinessId");
-
-                    b.HasIndex("BusinessId", "IsActive");
-
-                    b.ToTable("BookingTypes", (string)null);
+                    b.ToTable("BookingTypes");
                 });
 
             modelBuilder.Entity("Domain.Models.BookingTypeResource", b =>
@@ -282,8 +272,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
@@ -293,13 +282,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BusinessId");
-
-                    b.HasIndex("BusinessId", "IsActive");
-
-                    b.HasIndex("BusinessId", "Type");
-
-                    b.ToTable("Resources", (string)null);
+                    b.ToTable("Resources");
                 });
 
             modelBuilder.Entity("Domain.Models.User", b =>
@@ -361,20 +344,6 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Models.Booking", b =>
-                {
-                    b.HasOne("Domain.Models.BookingType", null)
-                        .WithMany()
-                        .HasForeignKey("BookingTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.Resource", null)
-                        .WithMany()
-                        .HasForeignKey("ResourceId")
-                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("Domain.Models.BookingTypeResource", b =>
