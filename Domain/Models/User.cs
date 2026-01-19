@@ -13,5 +13,8 @@ namespace Domain.Models
         public DateTime? DateOfBirth { get; set; }
         public UserRole Role { get; set; } 
         public DateTime CreatedAt { get; set; }
+
+        // Navigation - User can own multiple businesses
+        public ICollection<Business> Businesses { get; set; } = new List<Business>();
     }
 }
