@@ -35,5 +35,11 @@ namespace Infrastructure.Repositories
         {
             await _context.SaveChangesAsync(cancellationToken);
         }
+        
+        public async Task<User?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        }
     }
 }
