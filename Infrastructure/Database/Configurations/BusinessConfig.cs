@@ -61,6 +61,13 @@ namespace Infrastructure.Database.Configurations
                 .HasColumnName("owner_id")
                 .IsRequired();
 
+            builder.Property(b => b.CreatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("NOW()");
+
+            builder.Property(b => b.UpdatedAt)
+                .IsRequired();
+
             // Relationships
             // TODO: Add relationships when we have implemented related entities
 
