@@ -1,6 +1,12 @@
-﻿namespace Domain.Models
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Application.Businesses.DTOs
 {
-    public class Business
+    public class BusinessDetailsDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -11,18 +17,6 @@
         public string Category { get; set; } = string.Empty; // Could be an Enum or separate Entity
         public double Rating { get; set; } // Aggregated from reviews
         public string ImageUrl { get; set; } = string.Empty;
-
         public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-
-        // Navigation
-        public Guid OwnerId { get; set; }
-        public User Owner { get; set; } = null!;
-
-        // TODO: Add navigation properties for related entities when they are implemented
-
-        /*public ICollection<Service> Services { get; set; } = null!;
-        public ICollection<Staff> Staff { get; set; } = null!;
-        public ICollection<Review> Reviews { get; set; } = null!;*/
     }
 }

@@ -14,7 +14,8 @@ namespace Infrastructure
         {
             // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
-            
+            services.AddScoped<IBusinessRepository, BusinessRepository>();
+
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
             // Database configuration
