@@ -17,6 +17,7 @@ namespace Infrastructure
             services.AddScoped<IBusinessRepository, BusinessRepository>();
 
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<ITokenService, TokenService>();
 
             // Database configuration
             var connectionString = configuration.GetConnectionString("DefaultConnection");

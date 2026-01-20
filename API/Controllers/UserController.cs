@@ -6,7 +6,7 @@ using Application.Common;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/auth")]
+    [Route("api/users")]
     
     public class UserController : ControllerBase
     {
@@ -17,7 +17,7 @@ namespace API.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("register")]
+        [HttpPost("createuser")]
         public async Task<IActionResult> Register([FromBody] CreateUserCommand command)
         {
             var result = await _mediator.Send(command);
