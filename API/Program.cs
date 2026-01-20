@@ -8,6 +8,7 @@ namespace API
     {
         public static void Main(string[] args)
         {
+            System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.

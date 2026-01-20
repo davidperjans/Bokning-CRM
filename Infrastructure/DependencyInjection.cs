@@ -1,10 +1,13 @@
-﻿using Application.Interface;
+﻿using System.Text;
+using Application.Interface;
 using Infrastructure.Authentication;
 using Infrastructure.Database;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.JwtBearer; 
+using Microsoft.IdentityModel.Tokens; 
 
 namespace Infrastructure
 {
@@ -15,9 +18,12 @@ namespace Infrastructure
             // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IBusinessRepository, BusinessRepository>();
-
+            
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
             services.AddScoped<ITokenService, TokenService>();
+            
+            services.AddHttpContextAccessor();
+            services.AddScoped<IUserContext, UserContext>();
 
             // Database configuration
             var connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -28,6 +34,29 @@ namespace Infrastructure
                     options.UseNpgsql(connectionString);
                 }
             });
+            
+            // JWT Authentication configuration
+            var jwtSettings = configuration.GetSection("JwtSettings");
+            var secret = jwtSettings["Secret"] ?? throw new InvalidOperationException("JWT Secret is missing");
+            
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings["Issuer"],
+                        ValidAudience = jwtSettings["Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
+                    };
+                });
 
             return services;
         }

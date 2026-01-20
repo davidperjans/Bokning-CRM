@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Application.Common;
+using Application.Users.Queries.GetCurrentUser;
 
 namespace API.Controllers
 {
@@ -35,6 +36,23 @@ namespace API.Controllers
 
             // Returnera 201 Created med UserDto i bodyn
             return CreatedAtAction(nameof(Register), new { id = result.Value!.Id }, result.Value);
+        }
+        
+        [HttpGet("currentuser")]
+        public async Task<IActionResult> GetCurrentProfile()
+        {
+            // Vi skickar vår query via MediatR
+            var result = await _mediator.Send(new GetCurrentUserQuery());
+
+            if (!result.IsSuccess)
+            {
+                // Om användaren inte hittas eller token är ogiltig
+                return result.ErrorMessage == "Användaren hittades inte i databasen." 
+                    ? NotFound(new { message = result.ErrorMessage }) 
+                    : Unauthorized(new { message = result.ErrorMessage });
+            }
+
+            return Ok(result.Value);
         }
     }
 }
