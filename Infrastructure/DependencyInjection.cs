@@ -25,6 +25,11 @@ namespace Infrastructure
             services.AddHttpContextAccessor();
             services.AddScoped<IUserContext, UserContext>();
 
+            services.AddScoped<IBookingRepository, BookingRepository>();
+            services.AddScoped<IBookingTypeRepository, BookingTypeRepository>();
+            services.AddScoped<IResourceRepository, ResourceRepository>();
+
+
             // Database configuration
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<AppDbContext>(options =>
