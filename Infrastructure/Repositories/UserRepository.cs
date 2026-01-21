@@ -41,5 +41,12 @@ namespace Infrastructure.Repositories
             return await _context.Users
                 .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
         }
+
+        public async Task SaveRefreshTokenAsync(RefreshToken refreshToken,
+            CancellationToken cancellationToken = default)
+        {
+            await _context.RefreshTokens.AddAsync(refreshToken);
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -5,6 +5,7 @@ using Domain.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
 
 namespace Infrastructure.Authentication
 {
@@ -54,6 +55,17 @@ namespace Infrastructure.Authentication
             );
             
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string GenerateRefreshToken(Guid userId)
+        {
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                // Konverterar arrayen till en läsbar Base64-sträng
+                return Convert.ToBase64String(randomNumber);
+            }
         }
     }
 }
