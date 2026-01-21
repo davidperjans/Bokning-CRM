@@ -150,5 +150,16 @@ namespace Infrastructure.Repositories
 
             return new PagedResult<BusinessListItemDto>(items, p.Page, p.PageSize, totalCount);
         }
+        
+        public async Task<List<Business>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.Businesses
+                .Include(b => b.Owner) // VIKTIGT: Hämtar användardatan kopplad till företaget
+                .AsNoTracking()        // Snabbare sökning eftersom vi bara ska läsa data
+                .OrderByDescending(b => b.CreatedAt) // Visar de nyaste företagen först
+                .ToListAsync(cancellationToken);
+        }
+        
+        
     }
 }
