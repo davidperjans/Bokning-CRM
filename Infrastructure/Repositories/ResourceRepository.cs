@@ -38,5 +38,26 @@ namespace Infrastructure.Repositories
                     x.ResourceId == resourceId,
                     ct);
         }
+
+        public async Task<List<Resource>> GetResourcesForBookingTypeAsync(
+            Guid businessId,
+            Guid bookingTypeId,
+            CancellationToken ct)
+        {
+            var resourceIds = await _context.BookingTypeResources
+                .Where(x => x.BookingTypeId == bookingTypeId)
+                .Select(x => x.ResourceId)
+                .ToListAsync(ct);
+
+            return await _context.Resources
+                .AsNoTracking()
+                .Where(r =>
+                    r.BusinessId == businessId &&
+                    r.IsActive &&
+                    !r.IsDeleted &&
+                    resourceIds.Contains(r.Id))
+                .ToListAsync(ct);
+        }
+
     }
 }

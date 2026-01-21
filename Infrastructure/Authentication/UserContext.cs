@@ -35,5 +35,33 @@ namespace Infrastructure.Authentication
                 return null;
             }
         }
+
+        public Guid? BusinessId
+        {
+            get
+            {
+                var user = _httpContextAccessor.HttpContext?.User;
+
+                if (user == null || !user.Identity!.IsAuthenticated)
+                {
+                    return null;
+                }
+
+                // Försök hitta BusinessId-claim
+                // Byt claim-namn här om du använder något annat (t.ex. "businessId" eller "business_id")
+                var businessIdValue =
+                    user.FindFirst("businessId")?.Value
+                    ?? user.FindFirst("business_id")?.Value
+                    ?? user.FindFirst("business")?.Value;
+
+                if (Guid.TryParse(businessIdValue, out var guid))
+                {
+                    return guid;
+                }
+
+                return null;
+            }
+        }
+
     }
 }

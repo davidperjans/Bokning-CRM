@@ -61,5 +61,10 @@ namespace Infrastructure.Repositories
                     b.Status != BookingStatus.Cancelled,
                     ct);
         }
+        public async Task SaveChangesAsync(CancellationToken ct)
+        {
+            await _context.SaveChangesAsync(ct);
+        }
+
     }
 }

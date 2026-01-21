@@ -6,17 +6,17 @@ namespace Application.Interface
     {
         Task<Booking?> GetBookingByIdAsync(Guid bookingId, CancellationToken ct);
         Task AddAsync(Booking booking, CancellationToken ct);
+
         Task<bool> ExistsOverlappingAsync(
-            Guid busniessId,
+            Guid businessId,
             Guid resourceId,
             DateTime startUtc,
             DateTime endUtc,
             CancellationToken ct);
 
-        Task<int> CountActiveForUserAsync(
-        Guid businessId,
-        Guid userId,
-        CancellationToken ct);
+        Task<int> CountActiveForUserAsync(Guid businessId, Guid userId, CancellationToken ct);
+
+        Task SaveChangesAsync(CancellationToken ct);
 
 
     }
