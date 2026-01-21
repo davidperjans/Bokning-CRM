@@ -18,9 +18,12 @@ namespace Tests.Unit.Businesses
 
             var dto = new BusinessWithServicesDto
             {
-                Id = Guid.NewGuid(),
-                Name = "Pizza Palace",
-                Slug = "pizza-palace",
+                Business = new BusinessSummaryDto
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Pizza Palace",
+                    Slug = "pizza-palace"
+                },
                 Services = new List<ServiceDto>()
             };
 
