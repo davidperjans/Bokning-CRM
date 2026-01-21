@@ -30,13 +30,15 @@ namespace Tests.Unit.Businesses
 
             var dto = new BusinessWithServicesDto
             {
-                Id = Guid.NewGuid(),
-                Name = "Pizza Palace",
-                Slug = "pizza-palace",
-                Services = new List<ServiceDto>
-            {
-                new() { Id = Guid.NewGuid(), Name = "Herrklippning", Description = "Cut", DurationMinutes = 30, Price = 299m }
-            }
+                Business = new BusinessSummaryDto
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Pizza Palace",
+                    Slug = "pizza-palace",
+                    
+                },
+                Services = { new() { Id = Guid.NewGuid(), Name = "Herrklippning", Description = "Cut", DurationMinutes = 30, Price = 299m } }
+
             };
 
             repo.Setup(r => r.GetWithServicesBySlugAsync("pizza-palace", It.IsAny<CancellationToken>()))

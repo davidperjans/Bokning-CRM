@@ -2,6 +2,7 @@
 using Application.Businesses.Queries.GetBusinesses;
 using Application.Common;
 using Application.Interface;
+using Application.Reviews.DTOs;
 using Application.Services.DTOs;
 using Domain.Enum;
 using Domain.Models;
@@ -47,9 +48,12 @@ namespace Infrastructure.Repositories
             .Where(b => b.Slug == slug)
             .Select(b => new BusinessWithServicesDto
             {
-                Id = b.Id,
-                Name = b.Name,
-                Slug = b.Slug,
+                Business = new BusinessSummaryDto
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    Slug = b.Slug
+                },
                 Services = b.Services
                     .OrderBy(s => s.Name)
                     .Select(s => new ServiceDto
@@ -58,7 +62,36 @@ namespace Infrastructure.Repositories
                         Name = s.Name,
                         Description = s.Description,
                         Price = s.Price,
-                        DurationMinutes = s.DurationMinutes
+                        DurationMinutes = s.DurationMinutes,
+                        IsActive = s.IsActive
+                    })
+                    .ToList()
+            })
+            .FirstOrDefaultAsync(ct);
+        }
+
+        public async Task<BusinessWithReviewsDto?> GetWithReviewsBySlugAsync(string slug, CancellationToken ct)
+        {
+            return await _context.Businesses
+            .AsNoTracking()
+            .Where(b => b.Slug == slug)
+            .Select(b => new BusinessWithReviewsDto
+            {
+                Business = new BusinessSummaryDto
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    Slug = b.Slug
+                },
+                Reviews = b.Reviews
+                    .OrderByDescending(r => r.CreatedAt)
+                    .Select(r => new ReviewDto
+                    {
+                        Id = r.Id,
+                        Rating = r.Rating,
+                        FullName = (r.User.FirstName + " " + r.User.LastName).Trim(),
+                        Comment = r.Comment,
+                        CreatedAt = r.CreatedAt
                     })
                     .ToList()
             })

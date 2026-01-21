@@ -16,5 +16,6 @@ namespace Domain.Models
 
         // Navigation - User can own multiple businesses
         public ICollection<Business> Businesses { get; set; } = new List<Business>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }

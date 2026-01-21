@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Database.Configurations
 {
-    public sealed class ServiceConfiguration : IEntityTypeConfiguration<Service>
+    public sealed class ServiceConfig : IEntityTypeConfiguration<Service>
     {
         public void Configure(EntityTypeBuilder<Service> builder)
         {
@@ -34,8 +34,8 @@ namespace Infrastructure.Database.Configurations
             builder.HasIndex(s => new { s.BusinessId, s.IsActive });
 
             // Relation: Business (1) -> Services (many)
-            builder.HasOne<Business>() // eller .HasOne(s => s.Business) om du har nav-prop
-                .WithMany(b => b.Services) // kräver att Business har ICollection<Service> Services
+            builder.HasOne(s => s.Business)
+                .WithMany(b => b.Services)
                 .HasForeignKey(s => s.BusinessId)
                 .OnDelete(DeleteBehavior.Cascade);
         }

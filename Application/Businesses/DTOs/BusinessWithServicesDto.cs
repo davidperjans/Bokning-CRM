@@ -10,9 +10,7 @@ namespace Application.Businesses.DTOs
 {
     public class BusinessWithServicesDto
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Slug { get; set; } = string.Empty; 
+        public BusinessSummaryDto Business { get; set; } = new();
         public List<ServiceDto> Services { get; set; } = new();
     }
 }
