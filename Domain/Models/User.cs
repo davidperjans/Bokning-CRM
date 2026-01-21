@@ -14,6 +14,8 @@ namespace Domain.Models
         public UserRole Role { get; set; } 
         public DateTime CreatedAt { get; set; }
         
+        public string? ResetPasswordToken { get; set; }
+        public DateTime? ResetTokenExpires { get; set; }
 
         // Navigation - User can own multiple businesses
         public ICollection<Business> Businesses { get; set; } = new List<Business>();

@@ -63,5 +63,22 @@ namespace Infrastructure.Repositories
             
             return _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task<User?> GetByResetTokenAsync(string token, CancellationToken cancellationToken = default)
+        {
+            var normalizedToken = token.Trim().ToUpper();
+            
+            
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.ResetPasswordToken != null && 
+                                          u.ResetPasswordToken.Trim().ToUpper() == normalizedToken, 
+                    cancellationToken);
+        }
+
+        public  Task UpdateUserAsync(User user, CancellationToken cancellationToken = default)
+        {
+            _context.Users.Update(user);
+            return _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

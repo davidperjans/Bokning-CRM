@@ -16,5 +16,10 @@ namespace Application.Interface
         Task<RefreshToken?> GetRefreshTokenAsync(string token, CancellationToken cancellationToken = default);
         
         Task UpdateRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default);
+        
+        Task<User?> GetByResetTokenAsync(string token, CancellationToken cancellationToken = default);
+        
+        Task UpdateUserAsync(User user, CancellationToken cancellationToken = default);
+        
     }
 }
