@@ -48,5 +48,20 @@ namespace Infrastructure.Repositories
             await _context.RefreshTokens.AddAsync(refreshToken);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<RefreshToken?> GetRefreshTokenAsync(string token,
+            CancellationToken cancellationToken = default)
+        {
+            return await _context.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == token, cancellationToken);
+        }
+
+        public Task UpdateRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default)
+        {
+            _context.RefreshTokens.Update(refreshToken);
+            
+            return _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

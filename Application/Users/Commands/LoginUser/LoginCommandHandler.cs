@@ -39,7 +39,7 @@ namespace Application.Users.Commands.LoginUser
             var expiryDate = DateTime.UtcNow.AddDays(7);
 
             // 3. Skapa och spara Refresh Token i databasen
-            var refreshToken = new RefreshToken
+            var refreshToken = new Domain.Models.RefreshToken
             {
                 Token = refreshTokenString,
                 UserId = user.Id,
