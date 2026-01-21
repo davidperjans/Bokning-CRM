@@ -13,6 +13,7 @@ namespace Infrastructure.Database
         public DbSet<User> Users { get; set; }
         public DbSet<Business> Businesses { get; set; }
         public DbSet<Service> Services { get; set; }
+        public DbSet<Review> Reviews { get; set; }
         public DbSet<BusinessSettings> BusinessSettings { get; set; }
         public DbSet<BookingType> BookingTypes { get; set; }
         public DbSet<Resource> Resources { get; set; }
