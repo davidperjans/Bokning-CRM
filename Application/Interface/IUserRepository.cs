@@ -10,5 +10,11 @@ namespace Application.Interface
         Task SaveChangesAsync(CancellationToken cancellationToken = default);
         
         Task <User?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default);
+        
+        Task SaveRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default);
+        
+        Task<RefreshToken?> GetRefreshTokenAsync(string token, CancellationToken cancellationToken = default);
+        
+        Task UpdateRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default);
     }
 }
