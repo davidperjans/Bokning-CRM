@@ -21,8 +21,8 @@
 
         // TODO: Add navigation properties for related entities when they are implemented
 
-        /*public ICollection<Service> Services { get; set; } = null!;
-        public ICollection<Staff> Staff { get; set; } = null!;
-        public ICollection<Review> Reviews { get; set; } = null!;*/
+        public ICollection<Service> Services { get; set; } = null!;
+        //public ICollection<Staff> Staff { get; set; } = null!;
+        //public ICollection<Review> Reviews { get; set; } = null!;
     }
 }

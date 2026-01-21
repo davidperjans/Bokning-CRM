@@ -1,5 +1,6 @@
 ﻿using Application.Businesses.Queries.GetBusinesses;
 using Application.Businesses.Queries.GetDetailsBySlug;
+using Application.Businesses.Queries.GetServicesForBusiness;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,6 +14,21 @@ namespace API.Controllers
         public BusinessController(ISender mediator)
         {
             _mediator = mediator;
+        }
+
+        
+
+        [HttpGet]
+        public async Task<IActionResult> GetBusinesses([FromQuery] GetBusinessesQuery query, CancellationToken ct)
+        {
+            var result = await _mediator.Send(query, ct);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+
+            return Ok(result.Value);
         }
 
         [HttpGet("{slug}")]
@@ -29,14 +45,15 @@ namespace API.Controllers
             return Ok(result.Value);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetBusinesses([FromQuery] GetBusinessesQuery query, CancellationToken ct)
+        [HttpGet("{slug}/services")]
+        public async Task<IActionResult> GetServicesForBusiness(string slug, CancellationToken ct)
         {
+            var query = new GetServicesForBusinessQuery(slug);
             var result = await _mediator.Send(query, ct);
 
             if (!result.IsSuccess)
             {
-                return BadRequest(result.ErrorMessage);
+                return NotFound(result.ErrorMessage);
             }
 
             return Ok(result.Value);
