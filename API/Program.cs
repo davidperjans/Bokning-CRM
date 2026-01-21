@@ -18,8 +18,6 @@ namespace API
             builder.Services.AddApplicationServices(); 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddHttpContextAccessor();
-            builder.Services.AddScoped<Application.Interface.IUserContext, Infrastructure.Authentication.UserContext>();
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Bokning CRM API", Version = "v1" });

@@ -63,6 +63,9 @@ namespace Infrastructure
                     };
                 });
 
+            services.AddHttpContextAccessor();
+            services.AddScoped<Application.Interface.IUserContext, Infrastructure.Authentication.UserContext>();
+
             return services;
         }
     }
