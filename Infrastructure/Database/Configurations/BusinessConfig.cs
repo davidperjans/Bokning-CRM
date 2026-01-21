@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using Domain.Enum;
+using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -48,6 +49,13 @@ namespace Infrastructure.Database.Configurations
                 .HasMaxLength(100);
 
             builder.HasIndex(b => b.Category);
+            
+            builder.Property(b => b.Status)
+                .HasColumnName("status")
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .HasDefaultValue(BusinessStatus.Pending)
+                .IsRequired();
 
             builder.Property(b => b.Rating)
                 .HasColumnName("rating")
@@ -81,6 +89,8 @@ namespace Infrastructure.Database.Configurations
                 .WithOne(s => s.Business)
                 .HasForeignKey(s => s.BusinessId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            
 
             //builder.HasMany(b => b.Staff)
             //    .WithOne(s => s.Business)

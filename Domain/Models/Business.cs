@@ -1,4 +1,6 @@
-﻿namespace Domain.Models
+﻿using Domain.Enum;
+
+namespace Domain.Models
 {
     public class Business
     {
@@ -11,6 +13,8 @@
         public string Category { get; set; } = string.Empty; // Could be an Enum or separate Entity
         public double Rating { get; set; } // Aggregated from reviews
         public string ImageUrl { get; set; } = string.Empty;
+        
+        public BusinessStatus Status { get; set; } = BusinessStatus.Pending;
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

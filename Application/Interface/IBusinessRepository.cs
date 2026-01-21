@@ -1,6 +1,7 @@
 ﻿using Application.Businesses.DTOs;
 using Application.Businesses.Queries.GetBusinesses;
 using Application.Common;
+using Domain.Models;
 
 namespace Application.Interface
 {
@@ -10,5 +11,6 @@ namespace Application.Interface
         Task<PagedResult<BusinessListItemDto>> SearchAsync(BusinessSearchParams p, CancellationToken ct);
         Task<BusinessWithServicesDto?> GetWithServicesBySlugAsync(string slug, CancellationToken ct);
         Task<BusinessWithReviewsDto?> GetWithReviewsBySlugAsync(string slug, CancellationToken ct);
+        Task<List<Business>> GetAllAsync(CancellationToken cancellationToken = default);
     }
 }
