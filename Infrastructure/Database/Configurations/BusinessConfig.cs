@@ -72,7 +72,7 @@ namespace Infrastructure.Database.Configurations
             // TODO: Add relationships when we have implemented related entities
 
 
-            /*builder.HasOne(b => b.Owner)
+            builder.HasOne(b => b.Owner)
                 .WithMany(u => u.Businesses)
                 .HasForeignKey(b => b.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -82,15 +82,15 @@ namespace Infrastructure.Database.Configurations
                 .HasForeignKey(s => s.BusinessId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasMany(b => b.Staff)
-                .WithOne(s => s.Business)
-                .HasForeignKey(s => s.BusinessId)
-                .OnDelete(DeleteBehavior.Cascade);
+            //builder.HasMany(b => b.Staff)
+            //    .WithOne(s => s.Business)
+            //    .HasForeignKey(s => s.BusinessId)
+            //    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasMany(b => b.Reviews)
-                .WithOne(r => r.Business)
-                .HasForeignKey(r => r.BusinessId)
-                .OnDelete(DeleteBehavior.Cascade);*/
+            //builder.HasMany(b => b.Reviews)
+            //    .WithOne(r => r.Business)
+            //    .HasForeignKey(r => r.BusinessId)
+            //    .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

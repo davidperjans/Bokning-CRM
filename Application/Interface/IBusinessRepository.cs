@@ -8,5 +8,6 @@ namespace Application.Interface
     {
         Task<BusinessDetailsDto?> GetDetailsBySlugAsync(string slug, CancellationToken ct);
         Task<PagedResult<BusinessListItemDto>> SearchAsync(BusinessSearchParams p, CancellationToken ct);
+        Task<BusinessWithServicesDto?> GetWithServicesBySlugAsync(string slug, CancellationToken ct);
     }
 }

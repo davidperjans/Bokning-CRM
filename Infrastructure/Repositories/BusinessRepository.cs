@@ -2,15 +2,11 @@
 using Application.Businesses.Queries.GetBusinesses;
 using Application.Common;
 using Application.Interface;
+using Application.Services.DTOs;
 using Domain.Enum;
 using Domain.Models;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -42,6 +38,31 @@ namespace Infrastructure.Repositories
                     CreatedAt = b.CreatedAt
                 })
                 .FirstOrDefaultAsync(ct);
+        }
+
+        public async Task<BusinessWithServicesDto?> GetWithServicesBySlugAsync(string slug, CancellationToken ct)
+        {
+            return await _context.Businesses
+            .AsNoTracking()
+            .Where(b => b.Slug == slug)
+            .Select(b => new BusinessWithServicesDto
+            {
+                Id = b.Id,
+                Name = b.Name,
+                Slug = b.Slug,
+                Services = b.Services
+                    .OrderBy(s => s.Name)
+                    .Select(s => new ServiceDto
+                    {
+                        Id = s.Id,
+                        Name = s.Name,
+                        Description = s.Description,
+                        Price = s.Price,
+                        DurationMinutes = s.DurationMinutes
+                    })
+                    .ToList()
+            })
+            .FirstOrDefaultAsync(ct);
         }
 
         public async Task<PagedResult<BusinessListItemDto>> SearchAsync(BusinessSearchParams p, CancellationToken ct)
