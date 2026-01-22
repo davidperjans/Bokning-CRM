@@ -15,6 +15,8 @@ namespace Application.Interface
             CancellationToken ct);
 
         Task<int> CountActiveForUserAsync(Guid businessId, Guid userId, CancellationToken ct);
+        Task<List<Booking>> GetForUserAsync(Guid businessId, Guid userId, CancellationToken ct);
+        Task<List<Booking>> GetForBusinessAsync(Guid businessId, CancellationToken ct);
 
         Task SaveChangesAsync(CancellationToken ct);
 

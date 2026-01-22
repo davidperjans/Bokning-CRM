@@ -61,6 +61,33 @@ namespace Infrastructure.Repositories
                     b.Status != BookingStatus.Cancelled,
                     ct);
         }
+
+        public async Task<List<Booking>> GetForUserAsync(
+            Guid businessId,
+            Guid userId,
+            CancellationToken ct)
+        {
+            return await _context.Bookings
+                .AsNoTracking()
+                .Where(b =>
+                    b.BusinessId == businessId &&
+                    b.UserId == userId)
+                .OrderBy(b => b.StartTimeUtc)
+                .ToListAsync(ct);
+        }
+
+        public async Task<List<Booking>> GetForBusinessAsync(
+            Guid businessId,
+            CancellationToken ct)
+        {
+            return await _context.Bookings
+                .AsNoTracking()
+                .Where(b => b.BusinessId == businessId)
+                .OrderBy(b => b.StartTimeUtc)
+                .ToListAsync(ct);
+        }
+
+
         public async Task SaveChangesAsync(CancellationToken ct)
         {
             await _context.SaveChangesAsync(ct);

@@ -1,6 +1,8 @@
 ﻿using Application.Bookings.Commands.CancelBooking;
 using Application.Bookings.Commands.CreateBooking;
 using Application.Bookings.Queries.GetAvailableSlots;
+using Application.Bookings.Queries.GetMyBookings;
+using Application.Bookings.Queries.GetMyBookingsBusiness;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +19,17 @@ namespace API.Controllers
         public BookingsController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        [HttpGet("/api/user/bookings")]
+        public async Task<IActionResult> GetMyBookings(CancellationToken ct)
+        {
+            var result = await _mediator.Send(new GetMyBookingsQuery(), ct);
+
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
         // POST: /api/bookings
@@ -67,7 +80,22 @@ namespace API.Controllers
 
             return Ok(result);
         }
+
+        // GET /api/admin/bookings
+        [HttpGet("/api/admin/bookings")]
+        public async Task<IActionResult> GetAllBookingsForBusiness(CancellationToken ct)
+        {
+            var result = await _mediator.Send(new GetAllBookingsForBusinessQuery(), ct);
+
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
     }
+
+
 
     // Liten request-body för cancel endpoint
     public sealed class CancelBookingRequest
