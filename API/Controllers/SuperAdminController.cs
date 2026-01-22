@@ -9,7 +9,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/superadmin/getallbusinesses")]
-    [Authorize(Roles = nameof(UserRole.SuperAdmin))] // Endast SuperAdmin har tillträde
+    [Authorize(Policy = "SuperAdminOnly")] 
     public class SuperAdminController : ControllerBase
     {
         private readonly IMediator _mediator;

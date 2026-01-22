@@ -24,8 +24,9 @@ namespace Infrastructure.Authentication
                     return null;
                 }
 
-                var userIdValue = user.FindFirst(ClaimTypes.NameIdentifier)?.Value 
-                                  ?? user.FindFirst("sub")?.Value;
+                // I UserContext.cs
+                var userIdValue = user.FindFirst("sub")?.Value 
+                                  ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
                 if (Guid.TryParse(userIdValue, out var guid))
                 {
