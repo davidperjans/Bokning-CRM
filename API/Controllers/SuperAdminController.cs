@@ -1,4 +1,5 @@
-﻿using Application.Businesses.Queries.GetAllBusinesses;
+﻿using Application.Businesses.Commands;
+using Application.Businesses.Queries.GetAllBusinesses;
 using Domain.Enum;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -24,5 +25,18 @@ namespace API.Controllers
             var result = await _mediator.Send(new GetAllBusinessesQuery());
             return Ok(result);
         }
+        
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] BusinessStatus newStatus)
+        {
+            var result = await _mediator.Send(new UpdateBusinessStatusCommand(id, newStatus));
+
+            if (!result.IsSuccess)
+                return BadRequest(result.ErrorMessage);
+
+            return Ok(new { message = $"Företagets status har uppdaterats till {newStatus}." });
+        }
     }
+    
+    
 }
