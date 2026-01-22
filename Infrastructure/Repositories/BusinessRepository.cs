@@ -160,6 +160,17 @@ namespace Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
         
+        public async Task<Business?> GetByIdAsync(Guid id, CancellationToken ct)
+        {
+            return await _context.Businesses.FirstOrDefaultAsync(b => b.Id == id, ct);
+        }
+
+        public async Task UpdateAsync(Business business, CancellationToken ct)
+        {
+            _context.Businesses.Update(business);
+            await _context.SaveChangesAsync(ct);
+        }
+        
         
     }
 }

@@ -12,5 +12,8 @@ namespace Application.Interface
         Task<BusinessWithServicesDto?> GetWithServicesBySlugAsync(string slug, CancellationToken ct);
         Task<BusinessWithReviewsDto?> GetWithReviewsBySlugAsync(string slug, CancellationToken ct);
         Task<List<Business>> GetAllAsync(CancellationToken cancellationToken = default);
+        
+        Task<Business?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task UpdateAsync(Business business, CancellationToken cancellationToken = default);
     }
 }

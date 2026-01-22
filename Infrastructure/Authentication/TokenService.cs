@@ -33,10 +33,10 @@ namespace Infrastructure.Authentication
             // 2. Sätt upp Claims
             var claims = new List<Claim>
             {
-                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Email, user.Email),
-                new(ClaimTypes.Role, user.Role.ToString()),
-                new("FirstName", user.FirstName),
+                new(JwtRegisteredClaimNames.Sub, user.Id.ToString()), // Använd gärna standardnamn
+                new(JwtRegisteredClaimNames.Email, user.Email),
+                new("role", user.Role.ToString()), 
+                new("name", user.FirstName)      
             };
 
             // 3. Hantera utgångstid säkert (Fallback till 60 minuter)

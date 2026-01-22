@@ -1,12 +1,14 @@
 ﻿using System.Text;
 using Application.Interface;
 using Infrastructure.Authentication;
+using Infrastructure.Authentication.Authorization;
 using Infrastructure.Database;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer; 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens; 
 
 namespace Infrastructure
@@ -59,9 +61,19 @@ namespace Infrastructure
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = jwtSettings["Issuer"],
                         ValidAudience = jwtSettings["Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
+                        
+                        RoleClaimType = "role",
+                        NameClaimType = "name"
                     };
                 });
+            
+            services.AddScoped<IAuthorizationHandler, SuperAdminRequirementHandler>();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("SuperAdminOnly", policy =>
+                    policy.Requirements.Add(new SuperAdminRequirement()));
+            });
 
             services.AddHttpContextAccessor();
             services.AddScoped<Application.Interface.IUserContext, Infrastructure.Authentication.UserContext>();
