@@ -79,6 +79,8 @@ namespace Infrastructure.Database.Configurations
 
                         j.HasIndex("service_id").HasDatabaseName("ix_staff_service_service_id");
                     });
+            
+           
         }
     }
 }

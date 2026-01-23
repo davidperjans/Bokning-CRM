@@ -22,5 +22,19 @@ namespace Infrastructure.Repositories
                 .Where(s => ids.Contains(s.Id))
                 .ToListAsync(ct);
         }
+        
+        public async Task<Service?> GetServiceByIdAsync(Guid serviceId, CancellationToken ct)
+        {
+            // Vi hämtar tjänsten för att kunna uppdatera den
+            return await _db.Services
+                .FirstOrDefaultAsync(s => s.Id == serviceId, ct);
+        }
+
+        public async Task UpdateServiceAsync(Service service, CancellationToken ct)
+        {
+            _db.Services.Update(service);
+            
+            await _db.SaveChangesAsync(ct);
+        }
     }
 }

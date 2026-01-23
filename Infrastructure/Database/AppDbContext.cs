@@ -22,6 +22,7 @@ namespace Infrastructure.Database
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Staff> Staffs { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
+        public DbSet<WorkingHour> WorkingHours { get; set; }
 
 
 

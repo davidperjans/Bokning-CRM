@@ -1,4 +1,5 @@
 ﻿using Application.Services.Commands.CreateService;
+using Application.Services.Commands.UpdateService;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,5 +19,16 @@ public class ServicesController : ControllerBase
     {
         var result = await _mediator.Send(command);
         return result.IsSuccess ? Ok(result) : BadRequest(result);
+    }
+    
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateService(Guid id, [FromBody] UpdateServiceCommand command)
+    {
+        // Säkerställ att ID i URL matchar ID i bodyn
+        if (id != command.Id) return BadRequest("ID mismatch");
+
+        var result = await _mediator.Send(command);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.ErrorMessage);
+        
     }
 }
