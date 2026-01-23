@@ -3,7 +3,7 @@
     public enum UserRole
     {
         User,
-        BuisnessOwner,
+        BusinessOwner,
         SuperAdmin
     }
 }
