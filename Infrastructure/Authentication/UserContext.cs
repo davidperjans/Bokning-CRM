@@ -64,5 +64,15 @@ namespace Infrastructure.Authentication
             }
         }
 
+        public string? Role
+        {
+            get
+            {
+                var user = _httpContextAccessor.HttpContext?.User;
+                // Vi letar efter "role" direkt eftersom vi rensat standard-mappningen
+                return user?.FindFirst("role")?.Value;
+            }
+        }
+
     }
 }

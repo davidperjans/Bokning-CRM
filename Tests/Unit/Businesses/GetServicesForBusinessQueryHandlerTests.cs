@@ -27,18 +27,29 @@ namespace Tests.Unit.Businesses
         public async Task Handle_ReturnsDto_WhenFound()
         {
             var repo = new Mock<IBusinessRepository>();
+            var businessId = Guid.NewGuid();
+
+            // Vi skapar Service-objektet med konstruktorn (7 parametrar)
+            var serviceDto = new ServiceDto(
+                Guid.NewGuid(),      // Id
+                "Herrklippning",     // Name
+                "En klassisk klippning", // Description
+                30,                  // DurationMinutes
+                299m,                // Price
+                true,                // IsActive
+                businessId           // BusinessId
+            );
 
             var dto = new BusinessWithServicesDto
             {
                 Business = new BusinessSummaryDto
                 {
-                    Id = Guid.NewGuid(),
+                    Id = businessId,
                     Name = "Pizza Palace",
                     Slug = "pizza-palace",
-                    
                 },
-                Services = { new() { Id = Guid.NewGuid(), Name = "Herrklippning", Description = "Cut", DurationMinutes = 30, Price = 299m } }
-
+                // Vi lägger till vår skapade service i listan
+                Services = new List<ServiceDto> { serviceDto }
             };
 
             repo.Setup(r => r.GetWithServicesBySlugAsync("pizza-palace", It.IsAny<CancellationToken>()))
@@ -48,9 +59,11 @@ namespace Tests.Unit.Businesses
 
             var result = await handler.Handle(new GetServicesForBusinessQuery("pizza-palace"), CancellationToken.None);
 
+            // Assert
             Assert.True(result.IsSuccess);
             Assert.NotNull(result.Value);
             Assert.Equal(1, result.Value.Services.Count);
+            Assert.Equal("Herrklippning", result.Value.Services[0].Name);
         }
     }
 }

@@ -64,7 +64,7 @@ namespace Infrastructure
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
                         
                         RoleClaimType = "role",
-                        NameClaimType = "name"
+                        NameClaimType = "sub"
                     };
                 });
             
