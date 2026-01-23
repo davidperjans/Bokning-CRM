@@ -20,8 +20,10 @@ namespace Infrastructure.Database
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingTypeResource> BookingTypeResources { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-        
-        
+        public DbSet<Staff> Staffs { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
+
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
