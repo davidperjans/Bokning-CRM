@@ -1,0 +1,48 @@
+﻿using Application.Interface;
+using Domain.Enum;
+using Infrastructure.Database;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Infrastructure.Authentication.Authorization
+{
+    public class AdminRequirementHandler : AuthorizationHandler<AdminRequirement>
+    {
+        private readonly AppDbContext _context;
+        private readonly IUserContext _userContext;
+
+        public AdminRequirementHandler(AppDbContext context, IUserContext userContext)
+        {
+            _context = context;
+            _userContext = userContext;
+        }
+
+        protected override async Task HandleRequirementAsync(
+            AuthorizationHandlerContext context,
+            AdminRequirement requirement)
+        {
+            var userId = _userContext.UserId; // Kontrollera att denna hämtar från "sub"
+
+            if (!userId.HasValue || userId.Value == Guid.Empty)
+            {
+                return;
+            }
+
+            var user = await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == userId.Value)
+                .Select(u => new { u.Role })
+                .FirstOrDefaultAsync();
+
+            if (user != null && user.Role == UserRole.BusinessOwner)
+            {
+                context.Succeed(requirement);
+            }
+        }
+    }
+}
