@@ -1,4 +1,8 @@
 ﻿using Application.Admin.Commands.CreateStaff;
+using Application.Admin.Commands.UpdateBookingStatus;
+using Application.Admin.Queries;
+using Application.Bookings.Queries.GetMyBookingsBusiness;
+using Domain.Enum;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,5 +31,51 @@ namespace API.Controllers
 
             return Ok(result);
         }
+
+        // GET /api/admin/bookings
+        [HttpGet("/api/admin/bookings")]
+        public async Task<IActionResult> GetAllBookingsForBusiness(CancellationToken ct)
+        {
+            var result = await _mediator.Send(new GetAllBookingsForBusinessQuery(), ct);
+
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        // PUT /api/admin/bookings/{id}/status
+        [HttpPut("bookings/{id:guid}/status")]
+        public async Task<IActionResult> UpdateBookingStatus(
+            [FromRoute] Guid id,
+            [FromBody] UpdateBookingStatusRequest body,
+            CancellationToken ct)
+        {
+            var command = new UpdateBookingStatusCommand(id, body.NewStatus);
+
+            var result = await _mediator.Send(command, ct);
+
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpGet("dashboard/stats")]
+        public async Task<IActionResult> GetDashboardStats(CancellationToken ct)
+        {
+            var result = await _mediator.Send(new GetAdminDashboardStatsQuery(), ct);
+
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
     }
+
+    public sealed class UpdateBookingStatusRequest
+    {
+        public BookingStatus NewStatus { get; set; }
+    }
+
 }
