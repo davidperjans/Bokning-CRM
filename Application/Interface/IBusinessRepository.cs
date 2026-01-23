@@ -15,5 +15,7 @@ namespace Application.Interface
         
         Task<Business?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task UpdateAsync(Business business, CancellationToken cancellationToken = default);
+        
+        Task AddServiceAsync(Service service, CancellationToken cancellationToken = default);
     }
 }

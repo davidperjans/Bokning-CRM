@@ -56,15 +56,15 @@ namespace Infrastructure.Repositories
                 },
                 Services = b.Services
                     .OrderBy(s => s.Name)
-                    .Select(s => new ServiceDto
-                    {
-                        Id = s.Id,
-                        Name = s.Name,
-                        Description = s.Description,
-                        Price = s.Price,
-                        DurationMinutes = s.DurationMinutes,
-                        IsActive = s.IsActive
-                    })
+                    .Select(s => new ServiceDto(
+                        s.Id,
+                        s.Name,
+                        s.Description,
+                        s.DurationMinutes,
+                        s.Price,
+                        s.IsActive,
+                        b.Id // BusinessId
+                    ))
                     .ToList()
             })
             .FirstOrDefaultAsync(ct);
@@ -170,7 +170,13 @@ namespace Infrastructure.Repositories
             _context.Businesses.Update(business);
             await _context.SaveChangesAsync(ct);
         }
-        
-        
+
+        public async Task AddServiceAsync(Service service, CancellationToken ct = default)
+        {
+            _context.Services.Add(service);
+            await _context.SaveChangesAsync(ct);
+        }
+
+
     }
 }
