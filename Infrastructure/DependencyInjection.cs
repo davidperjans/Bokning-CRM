@@ -30,6 +30,8 @@ namespace Infrastructure
             services.AddScoped<IBookingRepository, BookingRepository>();
             services.AddScoped<IBookingTypeRepository, BookingTypeRepository>();
             services.AddScoped<IResourceRepository, ResourceRepository>();
+            services.AddScoped<IStaffRepository, StaffRepository>();
+            services.AddScoped<IServiceRepository, ServiceRepository>();
 
 
             // Database configuration
@@ -68,6 +70,13 @@ namespace Infrastructure
                     };
                 });
             
+            services.AddScoped<IAuthorizationHandler, SuperAdminRequirementHandler>();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("SuperAdminOnly", policy =>
+                    policy.Requirements.Add(new SuperAdminRequirement()));
+            });
+
             services.AddScoped<IAuthorizationHandler, SuperAdminRequirementHandler>();
             services.AddAuthorization(options =>
             {
