@@ -2,7 +2,6 @@
 using Application.Bookings.Commands.CreateBooking;
 using Application.Bookings.Queries.GetAvailableSlots;
 using Application.Bookings.Queries.GetMyBookings;
-using Application.Bookings.Queries.GetMyBookingsBusiness;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -74,18 +73,6 @@ namespace API.Controllers
                 resourceId);
 
             var result = await _mediator.Send(query, ct);
-
-            if (!result.IsSuccess)
-                return BadRequest(result);
-
-            return Ok(result);
-        }
-
-        // GET /api/admin/bookings
-        [HttpGet("/api/admin/bookings")]
-        public async Task<IActionResult> GetAllBookingsForBusiness(CancellationToken ct)
-        {
-            var result = await _mediator.Send(new GetAllBookingsForBusinessQuery(), ct);
 
             if (!result.IsSuccess)
                 return BadRequest(result);
