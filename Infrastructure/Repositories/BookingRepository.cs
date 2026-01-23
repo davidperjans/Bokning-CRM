@@ -87,7 +87,76 @@ namespace Infrastructure.Repositories
                 .ToListAsync(ct);
         }
 
+        public async Task<Booking?> GetByIdForBusinessAsync(Guid businessId, Guid bookingId, CancellationToken ct)
+        {
+            return await _context.Bookings
+                .FirstOrDefaultAsync(b => b.BusinessId == businessId && b.Id == bookingId, ct);
+        }
 
+        public async Task<int> CountForBusinessAsync(Guid businessId, CancellationToken ct)
+        {
+            return await _context.Bookings
+                .AsNoTracking()
+                .CountAsync(b => b.BusinessId == businessId, ct);
+        }
+
+        public async Task<int> CountUpcomingForBusinessAsync(Guid businessId, DateTime nowUtc, CancellationToken ct)
+        {
+            return await _context.Bookings
+                .AsNoTracking()
+                .CountAsync(b =>
+                    b.BusinessId == businessId &&
+                    b.StartTimeUtc > nowUtc &&
+                    b.Status != BookingStatus.Cancelled,
+                    ct);
+        }
+
+        public async Task<int> CountByStatusForBusinessAsync(Guid businessId, BookingStatus status, CancellationToken ct)
+        {
+            return await _context.Bookings
+                .AsNoTracking()
+                .CountAsync(b =>
+                    b.BusinessId == businessId &&
+                    b.Status == status,
+                    ct);
+        }
+
+        public async Task<int> CountInRangeForBusinessAsync(
+            Guid businessId,
+            DateTime startUtc,
+            DateTime endUtc,
+            CancellationToken ct)
+        {
+            return await _context.Bookings
+                .AsNoTracking()
+                .CountAsync(b =>
+                    b.BusinessId == businessId &&
+                    b.StartTimeUtc >= startUtc &&
+                    b.StartTimeUtc < endUtc,
+                    ct);
+        }
+
+        public async Task<bool> UpdateStatusAsync(
+            Guid businessId,
+            Guid bookingId,
+            BookingStatus newStatus,
+            CancellationToken ct)
+        {
+            var booking = await _context.Bookings
+                .FirstOrDefaultAsync(b =>
+                    b.BusinessId == businessId &&
+                    b.Id == bookingId,
+                    ct);
+
+            if (booking is null)
+                return false;
+
+            booking.Status = newStatus;
+            booking.UpdatedAtUtc = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync(ct);
+            return true;
+        }
         public async Task SaveChangesAsync(CancellationToken ct)
         {
             await _context.SaveChangesAsync(ct);
