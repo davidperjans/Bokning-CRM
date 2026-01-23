@@ -2,6 +2,8 @@
 using Application.Interface;
 using Application.Services.Commands.CreateService;
 using Domain.Models;
+using FluentValidation;
+using FluentValidation.Results; // Behövs för ValidationResult
 using Moq;
 using Xunit;
 
@@ -11,13 +13,24 @@ namespace Tests.Unit.Services
     {
         private readonly Mock<IBusinessRepository> _businessRepoMock;
         private readonly Mock<IUserContext> _userContextMock;
+        private readonly Mock<IValidator<CreateServiceCommand>> _validatorMock;
         private readonly CreateServiceHandler _handler;
 
         public CreateServiceHandlerTests()
         {
             _businessRepoMock = new Mock<IBusinessRepository>();
             _userContextMock = new Mock<IUserContext>();
-            _handler = new CreateServiceHandler(_businessRepoMock.Object, _userContextMock.Object);
+            _validatorMock = new Mock<IValidator<CreateServiceCommand>>();
+
+            // Uppdaterad med validatorn som tredje argument
+            _handler = new CreateServiceHandler(
+                _businessRepoMock.Object, 
+                _userContextMock.Object, 
+                _validatorMock.Object);
+
+            // Standard-setup: Låt valideringen gå igenom (IsValid = true) för att inte paja de vanliga testerna
+            _validatorMock.Setup(v => v.ValidateAsync(It.IsAny<CreateServiceCommand>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
         }
 
         [Fact]
@@ -52,7 +65,7 @@ namespace Tests.Unit.Services
             var command = new CreateServiceCommand(businessId, "Admin Service", "Desc", 30, 100, true);
 
             _userContextMock.Setup(x => x.UserId).Returns(adminId);
-            _userContextMock.Setup(x => x.Role).Returns("SuperAdmin"); // SuperAdmin-rollen testas här
+            _userContextMock.Setup(x => x.Role).Returns("SuperAdmin");
 
             _businessRepoMock.Setup(x => x.GetByIdAsync(businessId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Business { Id = businessId, OwnerId = ownerId });
@@ -86,6 +99,25 @@ namespace Tests.Unit.Services
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal("Access denied.", result.ErrorMessage);
+            _businessRepoMock.Verify(x => x.AddServiceAsync(It.IsAny<Service>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Handle_ShouldReturnFailure_WhenValidationFails()
+        {
+            // Arrange
+            var command = new CreateServiceCommand(Guid.Empty, "", "", 0, -10, true);
+            
+            // Simulera ett valideringsfel
+            var failures = new List<ValidationFailure> { new("Name", "Namnet får inte vara tomt") };
+            _validatorMock.Setup(v => v.ValidateAsync(It.IsAny<CreateServiceCommand>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult(failures));
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            Assert.False(result.IsSuccess);
             _businessRepoMock.Verify(x => x.AddServiceAsync(It.IsAny<Service>(), It.IsAny<CancellationToken>()), Times.Never);
         }
     }
