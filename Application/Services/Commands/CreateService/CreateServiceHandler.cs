@@ -2,6 +2,7 @@
 using Application.Interface;
 using Application.Services.DTOs;
 using Domain.Models;
+using FluentValidation;
 using MediatR;
 
 namespace Application.Services.Commands.CreateService
@@ -10,11 +11,13 @@ namespace Application.Services.Commands.CreateService
     {
         private readonly IBusinessRepository _businessRepository;
         private readonly IUserContext _userContext;
+        private readonly IValidator<CreateServiceCommand> _validator;
         
-        public CreateServiceHandler(IBusinessRepository businessRepository, IUserContext userContext)
+        public CreateServiceHandler(IBusinessRepository businessRepository, IUserContext userContext, IValidator<CreateServiceCommand> validator)
         {
             _businessRepository = businessRepository;
             _userContext = userContext;
+            _validator = validator;
         }
 
         public async Task<OperationResult<Guid>> Handle(CreateServiceCommand request,
@@ -29,6 +32,12 @@ namespace Application.Services.Commands.CreateService
             // Kontrollera behörighet: Ägare ELLER SuperAdmin
             bool isOwner = business.OwnerId == currentUserId;
             bool isSuperAdmin = _userContext.Role == "SuperAdmin";
+            
+            var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+            if (!validationResult.IsValid)
+            {
+                return OperationResult<Guid>.Failure(validationResult.Errors.First().ErrorMessage);
+            }
 
             if (!isOwner && !isSuperAdmin)
             {
