@@ -13,7 +13,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/admin")]
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOnly")]
     public class AdminController : ControllerBase
     {
         private readonly ISender _mediator;
@@ -82,6 +82,12 @@ namespace API.Controllers
 
             var result = await _mediator.Send(command, ct);
             return result.IsSuccess ? Ok(result.Value) : BadRequest(result);
+        }
+
+        [HttpGet("debug/claims")]
+        public IActionResult DebugClaims()
+        {
+            return Ok(User.Claims.Select(c => new { c.Type, c.Value }));
         }
     }
 

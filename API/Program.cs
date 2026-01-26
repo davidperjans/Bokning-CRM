@@ -15,7 +15,19 @@ namespace API
 
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddControllers();
-            builder.Services.AddApplicationServices(); 
+            builder.Services.AddApplicationServices();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins(builder.Configuration["AllowedOrigins"] ?? "http://localhost:3000")
+                          .AllowAnyMethod()
+                          .AllowAnyHeader()
+                          .AllowCredentials();
+                });
+            });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
@@ -54,7 +66,8 @@ namespace API
             }
 
             app.UseHttpsRedirection();
-            
+            app.UseCors("AllowFrontend");
+
             app.UseAuthentication();
             app.UseAuthorization();
 

@@ -31,5 +31,48 @@ namespace Infrastructure.Database
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var utcNow = DateTime.UtcNow;
+
+            foreach (var entry in ChangeTracker.Entries())
+            {
+                if (entry.State is not (EntityState.Added or EntityState.Modified))
+                    continue;
+
+                // Hoppa över Owned/Join entities om du vill (valfritt)
+                // if (entry.Metadata.IsOwned()) continue;
+
+                // UPDATED
+                var updatedAtProp = entry.Metadata.FindProperty("UpdatedAt");
+                if (updatedAtProp != null)
+                {
+                    entry.Property("UpdatedAt").CurrentValue = utcNow;
+                }
+
+                // CREATED (bara vid Added)
+                if (entry.State == EntityState.Added)
+                {
+                    var createdAtProp = entry.Metadata.FindProperty("CreatedAt");
+                    if (createdAtProp != null)
+                    {
+                        entry.Property("CreatedAt").CurrentValue = utcNow;
+                    }
+                }
+                else
+                {
+                    // Skydda CreatedAt från att ändras vid update (om det finns)
+                    var createdAtProp = entry.Metadata.FindProperty("CreatedAt");
+                    if (createdAtProp != null)
+                    {
+                        entry.Property("CreatedAt").IsModified = false;
+                    }
+                }
+            }
+
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
     }
 }
