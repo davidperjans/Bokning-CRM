@@ -1,4 +1,5 @@
 ﻿using Application.Businesses.Queries.GetBusinesses;
+using Application.Businesses.Queries.GetBusinessSetting;
 using Application.Businesses.Queries.GetDetailsBySlug;
 using Application.Businesses.Queries.GetReviewsForBusiness;
 using Application.Businesses.Queries.GetServicesForBusiness;
@@ -72,6 +73,15 @@ namespace API.Controllers
             }
 
             return Ok(result.Value);
+        }
+        [HttpGet("settings")]
+        public async Task<IActionResult> GetSettings(CancellationToken ct)
+        {
+            var result = await _mediator.Send(new GetBusinessSettingsQuery(), ct);
+    
+            return result.IsSuccess 
+                ? Ok(result.Value) 
+                : BadRequest(result.ErrorMessage);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.Admin.Commands.CreateStaff;
 using Application.Admin.Commands.UpdateBookingStatus;
+using Application.Admin.Commands.UpdateSchedule;
 using Application.Admin.Queries;
 using Application.Bookings.Queries.GetMyBookingsBusiness;
 using Domain.Enum;
@@ -70,6 +71,17 @@ namespace API.Controllers
                 return BadRequest(result);
 
             return Ok(result);
+        }
+        
+        [HttpPut("staff/{id}/schedule")]
+        public async Task<IActionResult> UpdateStaffSchedule(Guid id, [FromBody] UpdateStaffScheduleCommand command, CancellationToken ct)
+        {
+            // Säkerställ att ID i URL matchar ID i bodyn
+            if (id != command.StaffId) 
+                return BadRequest("ID mismatch: URL ID matchar inte bodyns StaffId.");
+
+            var result = await _mediator.Send(command, ct);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result);
         }
     }
 
