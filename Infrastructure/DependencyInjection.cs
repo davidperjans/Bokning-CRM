@@ -77,11 +77,11 @@ namespace Infrastructure
                     policy.Requirements.Add(new SuperAdminRequirement()));
             });
 
-            services.AddScoped<IAuthorizationHandler, SuperAdminRequirementHandler>();
+            services.AddScoped<IAuthorizationHandler, AdminRequirementHandler>();
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("SuperAdminOnly", policy =>
-                    policy.Requirements.Add(new SuperAdminRequirement()));
+                options.AddPolicy("AdminOnly", policy =>
+                    policy.Requirements.Add(new AdminRequirement()));
             });
 
             services.AddHttpContextAccessor();
